@@ -1,0 +1,23 @@
+www_domain: www.medvedtsev.ru
+gitlab_domain: gitlab.medvedtsev.ru
+grafana_domain: grafana.medvedtsev.ru
+prometheus_domain: prometheus.medvedtsev.ru
+alertmanager_domain: alertmanager.medvedtsev.ru
+certbot_args: "--email medvedtsev.ae@gmail.com"
+nginx_owner: www-data
+nginx_group: www-data
+monitoring_upstream: monitoring.ru-central1.internal
+gitlab_upstream: gitlab.ru-central1.internal
+www_upstream: app.ru-central1.internal
+resolver: "192.168.10.2"
+alertmanager_to: medvedtsev.ae@gmail.com
+alertmanager_from: "alert@inbox.ru"
+alertmanager_smarthost: "smtp.mail.ru:465"
+alertmanager_require_tls: false
+alertmanager_auth_username: "alert@inbox.ru"
+alertmanager_auth_identity: "alert@inbox.ru"
+alertmanager_auth_password: "password"
+app_upstream: app.ru-central1.internal
+mysql_master: "db01.ru-central1.internal"
+mysql_replica: "db02.ru-central1.internal"
+rev_proxy_domain: nginx.ru-central1.internal

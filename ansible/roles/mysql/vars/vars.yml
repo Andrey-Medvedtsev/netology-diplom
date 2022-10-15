@@ -1,0 +1,7 @@
+---
+mysql_packages:
+  - python3
+  - python3-pip
+  - mysql-server
+mysql_service: mysql
+mysql_conf_dir: "/etc/mysql"

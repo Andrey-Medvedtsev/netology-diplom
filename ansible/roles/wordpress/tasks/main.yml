@@ -1,0 +1,89 @@
+---
+
+    - name: add variables
+      become: true
+      include_vars: "default.yml" 
+    - name: Install prerequisites
+      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+ 
+    - name: Install LAMP Packages
+      become: true
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: [ 'apache2', 'mysql-server', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'prometheus-node-exporter' ]
+
+    - name: Install PHP Extensions
+      become: true
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: "{{ php_modules }}"
+
+  # Apache Configuration
+    - name: Create document root
+      become: true
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        owner: "www-data"
+        group: "www-data"
+        mode: '0755'
+
+    - name: Set up Apache VirtualHost
+      become: true
+      template:
+        src: "files/apache.conf.j2"
+        dest: "/etc/apache2/sites-available/{{ http_conf }}"
+      notify: Reload Apache
+
+    - name: Enable rewrite module
+      become: true
+      shell: /usr/sbin/a2enmod rewrite
+      notify: Reload Apache
+
+    - name: Enable new site
+      become: true
+      shell: /usr/sbin/a2ensite {{ http_conf }}
+      notify: Reload Apache
+
+    - name: Disable default Apache site
+      become: true
+      shell: /usr/sbin/a2dissite 000-default.conf
+      notify: Restart Apache
+
+  # UFW Configuration
+    - name: "UFW - Allow HTTP on port {{ http_port }}" 
+      become: true
+      ufw:
+        rule: allow
+        port: "{{ http_port }}"
+        proto: tcp
+
+  # WordPress Configuration
+    - name: Download and unpack latest WordPress
+      become: true
+      unarchive:
+        src: https://wordpress.org/latest.tar.gz
+        dest: "/var/www/{{ http_host }}"
+        remote_src: yes
+        creates: "/var/www/{{ http_host }}/wordpress"
+
+    - name: Set ownership
+      become: true
+      file:
+        path: "/var/www/{{ http_host }}"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+
+    - name: Set permissions for directories
+      become: true
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type d -exec chmod 750 {} \\;"
+
+    - name: Set permissions for files
+      become: true
+      shell: "/usr/bin/find /var/www/{{ http_host }}/wordpress/ -type f -exec chmod 640 {} \\;"
+
+    - name: Set up wp-config
+      become: true
+      template:
+        src: "files/wp-config.php.j2"
+        dest: "/var/www/{{ http_host }}/wordpress/wp-config.php"

@@ -1,0 +1,101 @@
+---
+  
+   - name: Reading config
+     become: true
+     include_vars:
+      file: config.yml
+      name: config
+   - name: Install node-exporter
+     become: true
+     apt: 
+      name: 
+        - prometheus-node-exporter
+      state: present
+      update_cache: yes
+   - name: Install NGINX
+     become: true
+     apt:
+      name:
+        - nginx-full
+        - python3-certbot-nginx
+      state: present
+
+   - name: Creating nginx.conf
+     become: true
+     template:
+      src: nginx.conf.j2
+      dest: /etc/nginx/nginx.conf
+      backup: true
+      mode: 0644
+      owner: root
+
+   - name: Disable all sites
+     become: true
+     block:
+      - name: deleting sites-enabled
+        file:
+          path: /etc/nginx/sites-enabled
+          state: absent
+      - name: creating sites-enabled
+        file:
+          path: /etc/nginx/sites-enabled
+          state: directory
+          mode: 0755
+          owner: root
+          group: root
+
+   - name: Create server .conf files
+     become: true
+     template:
+      src: "{{ item }}.conf.j2"
+      dest: "/etc/nginx/sites-available/{{ item }}.conf"
+      backup: true
+      mode: 0644
+      owner: root
+     loop:
+       - www
+       - gitlab
+       - prometheus
+       - alertmanager
+       - grafana
+
+   - name: link server .conf files
+     become: true
+     file:
+      src: "/etc/nginx/sites-available/{{ item }}.conf"
+      dest: "/etc/nginx/sites-enabled/{{ item }}.conf"
+      owner: root
+      group: root
+      state: link
+     loop:
+       - www
+       - gitlab
+       - prometheus
+       - alertmanager
+       - grafana
+
+   - name: Install snapd
+     become: true
+     apt:
+      name: snapd
+      state: latest
+
+   - name: Install Certbot
+     become: true  
+     command:
+      cmd: "snap install --classic certbot"
+
+   - name: Install letsencrypt certificates
+     become: true
+     command:
+      cmd: "certbot --nginx --noninteractive --agree-tos {{ config.certbot_args }} -d {{ item }}"
+     loop:
+      - "{{ config.www_domain }}"
+      - "{{ config.gitlab_domain }}"
+      - "{{ config.prometheus_domain }}"
+      - "{{ config.grafana_domain }}"
+      - "{{ config.alertmanager_domain }}"
+
+   - name: Reload nginx to activate specified site
+     become: true
+     service: name=nginx state=restarted

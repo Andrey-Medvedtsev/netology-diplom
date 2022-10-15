@@ -1,0 +1,16 @@
+
+---
+#System Settings
+php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
+
+#MySQL Settings
+mysql_db_host: "192.168.10.25"
+mysql_root_password: "secret"
+mysql_db: "wordpress"
+mysql_user: "wordpress"
+mysql_password: "wordpress"
+
+#HTTP Settings
+http_host: "www.medvedtsev.ru"
+http_conf: "medvedtsev.ru.conf"
+http_port: "80"

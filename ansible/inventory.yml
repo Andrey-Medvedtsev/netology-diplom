@@ -1,0 +1,42 @@
+---
+  git:
+    hosts:
+       gitlab:
+        ansible_host: gitlab
+        ansible_user: ubuntu
+  
+  git_runner:
+    hosts:
+       runner:
+        ansible_host: runner
+        ansible_user: ubuntu
+
+  monitor:
+    hosts:
+     monitoring:
+      ansible_host: monitoring
+      ansible_user: ubuntu
+
+  mysql_master:
+    hosts:
+     master:
+      ansible_host: db01
+      ansible_user: ubuntu
+ 
+  mysql_slave:
+    hosts: 
+     slave:
+      ansible_host: db02
+      ansible_user: ubuntu
+
+  nginx:
+    hosts:
+     proxy:
+      ansible_host: nginx
+      ansible_user: ubuntu
+
+  wordpress:
+    hosts:
+     app:
+      ansible_host: app
+      ansible_user: ubuntu

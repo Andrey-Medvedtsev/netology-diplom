@@ -1,0 +1,13 @@
+---
+  - name: Install docker and node-exporter
+    become: true
+    apt:
+      name:
+        - docker.io
+        - prometheus-node-exporter
+      state: present
+      update-cache: yes
+
+  - name: Install gitlab runner
+    become: true
+    shell: docker run -d --name gitlab-runner --restart always -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest

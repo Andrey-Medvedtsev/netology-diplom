@@ -1,0 +1,16 @@
+---
+  - name: Install docker and node-exporter
+    become: true
+    apt:
+      name:
+        - docker.io
+        - prometheus-node-exporter
+      state: present
+      update-cache: yes
+
+  - name: export var
+    become: true
+    shell: export GITLAB_HOME=/srv/gitlab
+  - name: Install gitlab
+    become: true
+    shell: docker run --detach --hostname gitlab.ru-central1.internal --publish 443:443 --publish 80:80 --publish 2222:22 --name gitlab --restart always --volume $GITLAB_HOME/config:/etc/gitlab --volume $GITLAB_HOME/logs:/var/log/gitlab --volume $GITLAB_HOME/data:/var/opt/gitlab --shm-size 256m gitlab/gitlab-ee:latest

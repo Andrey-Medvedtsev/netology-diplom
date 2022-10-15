@@ -1,0 +1,15 @@
+---
+mysql_port: 3306
+mysql_root_db_pass: secret
+mysql_db:
+  - name: wordpress
+    replicate: yes
+mysql_users:
+  - name: wordpress
+    pass: wordpress
+    priv: "*.*:ALL"
+mysql_repl_user:
+  - name: repl
+    pass: replica
+mysql_repl_role: master
+mysql_sql_mode: STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
